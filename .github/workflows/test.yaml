@@ -1,0 +1,35 @@
+name: Clone and Push Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_path:
+        description: 'Full image path (e.g., docker.io/test/xxx:0.1.0)'
+        required: true
+
+jobs:
+  clone-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+        contents: read
+        packages: write
+    steps:
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2 
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Pull and Retag the Image
+      run: |
+        ORIGINAL_IMAGE="${{ github.event.inputs.image_path }}"
+        NEW_IMAGE="ghcr.io/${{ github.repository_owner }}/${ORIGINAL_IMAGE#*/}"
+        docker pull $ORIGINAL_IMAGE
+        docker tag $ORIGINAL_IMAGE $NEW_IMAGE
+        echo "Image retagged from $ORIGINAL_IMAGE to $NEW_IMAGE"
+
+    - name: Push the Image to GHCR
+      run: |
+        NEW_IMAGE="ghcr.io/zong-zhe/${{ github.event.inputs.image_path }}"
+        docker push $NEW_IMAGE
