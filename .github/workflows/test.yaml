@@ -1,4 +1,4 @@
-name: Clone and Push Docker Image
+name: Get Docker Image
 
 on:
   workflow_dispatch:
