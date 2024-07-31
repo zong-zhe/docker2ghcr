@@ -11,7 +11,7 @@ on:
         required: true
 
 jobs:
-  clone-and-push:
+  pull-and-push:
     runs-on: ubuntu-latest
     permissions:
         contents: read
