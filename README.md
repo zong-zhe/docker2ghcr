@@ -13,6 +13,6 @@ If you want to pull `docker.io/rancher/k3s:v1.27.4-k3s1` for the `linux/arm64`, 
 After the action finished, you can use the following commands to pull and retag it.
 
 ```shell
-	docker pull ghcr.io/zong-zhe/k3s:v1.27.4-k3s1
-	docker tag ghcr.io/zong-zhe/k3s:v1.27.4-k3s1 docker.io/rancher/k3s:v1.27.4-k3s1
+docker pull ghcr.io/zong-zhe/k3s:v1.27.4-k3s1
+docker tag ghcr.io/zong-zhe/k3s:v1.27.4-k3s1 docker.io/rancher/k3s:v1.27.4-k3s1
 ```
