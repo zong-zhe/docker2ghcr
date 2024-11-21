@@ -39,15 +39,11 @@ jobs:
         docker pull --platform $PLATFORM $ORIGINAL_IMAGE
         docker tag $ORIGINAL_IMAGE $NEW_IMAGE
         echo "Image retagged from $ORIGINAL_IMAGE to $NEW_IMAGE for platform $PLATFORM"
-
-    - name: Push the Image to GHCR
-      run: |
         ORIGINAL_IMAGE="${{ github.event.inputs.image_path }}"
         NEW_IMAGE="ghcr.io/${{ github.repository_owner }}/${ORIGINAL_IMAGE#*/}"
         docker push $NEW_IMAGE
-
-    - name: Push the Image to ACR
-      run: |
         ORIGINAL_IMAGE="${{ github.event.inputs.image_path }}"
-        NEW_IMAGE="registry.cn-hangzhou.aliyuncs.com/acrreg/${ORIGINAL_IMAGE#*/}"
-        docker push $NEW_IMAGE
+        NEW_IMAGE_ACR="registry.cn-hangzhou.aliyuncs.com/acrreg/${ORIGINAL_IMAGE#*/}"
+        docker tag $NEW_IMAGE $NEW_IMAGE_ACR
+        docker push $NEW_IMAGE_ACR
+
