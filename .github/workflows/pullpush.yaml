@@ -47,7 +47,7 @@ jobs:
         docker push $NEW_IMAGE
 
     - name: Push the Image to ACR
-    - run: |
+      run: |
         ORIGINAL_IMAGE="${{ github.event.inputs.image_path }}"
         NEW_IMAGE="registry.cn-hangzhou.aliyuncs.com/acrreg/${ORIGINAL_IMAGE#*/}"
         docker push $NEW_IMAGE
