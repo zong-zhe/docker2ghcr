@@ -28,7 +28,7 @@ RUN ln -sf /usr/local/python3.9/bin/python3.9 /usr/bin/python3.9
 
 # rust
 # https://www.rust-lang.org/tools/install
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain 1.83.0
 ENV PATH="/root/.cargo/bin:${PATH}"
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
