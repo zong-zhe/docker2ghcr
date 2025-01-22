@@ -43,16 +43,16 @@ RUN apt-get install -y clang-12 lld-12
 RUN ln -sf /usr/bin/clang-12   /usr/bin/clang
 RUN ln -sf /usr/bin/wasm-ld-12 /usr/bin/wasm-ld
 
-# golang 1.23+
+# golang 1.23.1+
 RUN mkdir -p /root/download && cd /root/download \
-  && wget https://dl.google.com/go/go1.23.linux-amd64.tar.gz \
-  && tar -zxvf go1.23.linux-amd64.tar.gz \
-  && mv ./go /usr/local/go1.23
-RUN ln -sf /usr/local/go1.23/bin/go /usr/bin/go
+  && wget https://dl.google.com/go/go1.23.1.linux-amd64.tar.gz \
+  && tar -zxvf go1.23.1.linux-amd64.tar.gz \
+  && mv ./go /usr/local/go1.23.1
+RUN ln -sf /usr/local/go1.23.1/bin/go /usr/bin/go
 RUN rm -rf /root/download
 
 ENV GOPATH=/go
-ENV GOLANG_VERSION=1.23
+ENV GOLANG_VERSION=1.23.1
 
 RUN go install golang.org/x/lint/golint@latest
 RUN go install golang.org/x/tools/cmd/goimports@latest
