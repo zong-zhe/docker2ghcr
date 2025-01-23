@@ -8,6 +8,11 @@ FROM centos:centos7
 # https://access.redhat.com/articles/2050743
 RUN touch /etc/sysconfig/64bit_strstr_via_64bit_strstr_sse2_unaligned
 
+RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak \
+  && curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
+  && yum clean all \
+  && yum makecache
+
 # ---------------------------------------------------------------------------------
 # Please note: The following steps are to install the dependency packages 
 # needed to compile CPython for centos7, see the 
