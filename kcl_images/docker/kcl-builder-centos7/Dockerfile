@@ -77,6 +77,9 @@ RUN rustup target add wasm32-unknown-unknown
 
 RUN yum -y install centos-release-scl
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
+
+RUN yum-config-manager --disable centos-sclo-rh
+
 RUN yum -y install llvm-toolset-7.0
 RUN yum -y install llvm-toolset-7.0\*
 RUN scl enable llvm-toolset-7.0 bash
