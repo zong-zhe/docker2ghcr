@@ -13,8 +13,10 @@ RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak \
   && yum makecache
 
 # 更新 DNS 设置
-RUN echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > /tmp/resolv.conf && \
-    mv /tmp/resolv.conf /etc/resolv.conf
+RUN { \
+    echo "nameserver 8.8.8.8"; \
+    echo "nameserver 8.8.4.4"; \
+} > /etc/resolv.conf
 
 # ---------------------------------------------------------------------------------
 # 请注意：以下步骤是为编译 CPython 在 centos7 上安装依赖包所需的，请参见
