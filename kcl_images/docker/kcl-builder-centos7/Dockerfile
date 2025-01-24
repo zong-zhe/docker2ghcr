@@ -6,14 +6,12 @@ FROM centos:centos7
 # https://access.redhat.com/articles/2050743
 RUN touch /etc/sysconfig/64bit_strstr_via_64bit_strstr_sse2_unaligned
 
-# 使用阿里云的 CentOS 镜像源
-RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak \
-  && curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
-  && yum clean all \
-  && yum makecache
-
-RUN yum install epel-release
-
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* && \
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+RUN yum install -y epel-release
+RUN yum groups mark install "Development Tools"
+RUN yum groups mark convert "Development Tools"
+RUN yum groupinstall "Development Tools"
 # ---------------------------------------------------------------------------------
 # 请注意：以下步骤是为编译 CPython 在 centos7 上安装依赖包所需的，请参见
 # [Python 官方网站](https://devguide.python.org/setup/#install-dependencies) 了解详细信息。
@@ -50,8 +48,6 @@ RUN rustc --version
 # wasm
 RUN rustup target add wasm32-unknown-unknown
 
-# 安装 clang7 和 llvm7
-# 使用 centos-release-scl 包安装仓库
 RUN yum -y install centos-release-scl
 RUN yum -y install llvm-toolset-7.0
 RUN yum -y install llvm-toolset-7.0\*
