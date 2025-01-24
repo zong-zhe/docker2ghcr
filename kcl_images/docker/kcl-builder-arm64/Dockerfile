@@ -15,6 +15,9 @@ RUN apt install -y pkg-config libssl-dev
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
+RUN rustup install 1.83.0
+RUN rustup default 1.83.0
+
 RUN cargo version
 RUN rustc --version
 
