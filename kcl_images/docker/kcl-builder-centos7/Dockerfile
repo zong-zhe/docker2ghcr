@@ -12,6 +12,8 @@ RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak \
   && yum clean all \
   && yum makecache
 
+RUN yum install epel-release
+
 # ---------------------------------------------------------------------------------
 # 请注意：以下步骤是为编译 CPython 在 centos7 上安装依赖包所需的，请参见
 # [Python 官方网站](https://devguide.python.org/setup/#install-dependencies) 了解详细信息。
