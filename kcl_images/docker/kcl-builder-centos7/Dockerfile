@@ -1,3 +1,5 @@
+# Copyright The KCL Authors. All rights reserved.
+
 FROM centos:centos7
 
 # macOS M1 --platform linux/amd64
@@ -6,34 +8,46 @@ FROM centos:centos7
 # https://access.redhat.com/articles/2050743
 RUN touch /etc/sysconfig/64bit_strstr_via_64bit_strstr_sse2_unaligned
 
-RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* && \
-    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
-RUN yum install -y epel-release
-RUN yum groups mark install "Development Tools"
-RUN yum groups mark convert "Development Tools"
+# 设置阿里云的 Yum 镜像源
+RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup && \
+    curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo && \
+    sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo && \
+    yum clean all && \
+    yum makecache
+
 # ---------------------------------------------------------------------------------
-# 请注意：以下步骤是为编译 CPython 在 centos7 上安装依赖包所需的，请参见
-# [Python 官方网站](https://devguide.python.org/setup/#install-dependencies) 了解详细信息。
+# Please note: The following steps are to install the dependency packages 
+# needed to compile CPython for centos7, see the 
+# [Python official website](https://devguide.python.org/setup/#install-dependencies) 
+# for details. When the version of CPython used becomes higher, 
+# please pay attention to update the installation dependencies. 
 # ---------------------------------------------------------------------------------
 
-# 一些与开发和编译相关的语言环境和插件，例如 git、CPython 编译等。
+# Some language environments and plug-ins related to development and compilation, 
+# such as git, CPython compilation, etc.
 RUN yum groupinstall -y "Development Tools"
-# 编译 CPython 所需的编译器和工具链，例如 gcc、make、sqlite3、ctype、struct 等。
+# Compiler and tool chain required to compile CPython such as gcc, make, sqlite3, ctype, struct, etc.
 RUN yum install -y gcc patch libffi-devel python-devel zlib-devel bzip2-devel ncurses-devel sqlite-devel 
-RUN yum install -y libpcap-devel xz-devel readline-devel tk-devel gdbm-devel db4-devel
-# 安装 UNIX 系统上 python3 所需的系统库
+RUN yum install -y libpcap-devel xz-devel readline-devel tk-devel gdbm-devel db4-deve
+# Install the system libraries required by python3 for UNIX based systems
 RUN yum -y install yum-utils
 RUN yum-builddep -y python3
-# 编译 Python 源码时需要的 python zlib 模块依赖包
+# The python zlib module dependency package is required when compiling the python source code, 
+# in order to use the modules that require zlib, such as setuptools, etc.
 RUN yum install -y zlib* 
-# 编译 Python 源码时需要的 python ssl 模块依赖包
+# The python ssl module dependency package is required when compiling the python source code, 
+# in order to use the modules that require ssl, such as pip3, twine, etc.
 RUN yum install -y openssl-devel
 
-# 安装 which
+# Install which
 RUN yum install -y which
 
-# 安装 wget
+# Install wget
 RUN yum install -y wget
+
+# Install git-2.x
+# RUN yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm
+# RUN yum -y install git
 
 # rust
 # https://www.rust-lang.org/tools/install
@@ -47,16 +61,35 @@ RUN rustc --version
 # wasm
 RUN rustup target add wasm32-unknown-unknown
 
+# Install clang7 and llvm7
+# https://www.softwarecollections.org/en/scls/rhscl/llvm-toolset-7.0/
+#
+# 1. Install a package with repository for your system:
+# On CentOS, install package centos-release-scl available in CentOS repository:
+#   $ sudo yum install centos-release-scl
+# 
+# On RHEL, enable RHSCL repository for you system:
+#   $ sudo yum-config-manager --enable rhel-server-rhscl-7-rpms
+#
+# 2. Install the collection:
+#   $ sudo yum install llvm-toolset-7.0
+#
+# 3. Start using software collections:
+#   $ scl enable llvm-toolset-7.0 bash
+
 RUN yum -y install centos-release-scl
+RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
 RUN yum -y install llvm-toolset-7.0
 RUN yum -y install llvm-toolset-7.0\*
+RUN scl enable llvm-toolset-7.0 bash
 
-# 安装 gcc7
+# Install gcc7
 RUN yum -y install devtoolset-7*
 RUN scl enable devtoolset-7 bash
 RUN gcc -v
 
-# 设置 LD_LIBRARY_PATH 和 PATH
+# rpm -ql llvm-toolset-7.0-clang.x86_64
+# /opt/rh/llvm-toolset-7.0/root/usr/lib64/libLLVM-7.so
 ENV LD_LIBRARY_PATH="/opt/rh/llvm-toolset-7.0/root/usr/lib64:${LD_LIBRARY_PATH}"
 ENV PATH="/opt/rh/llvm-toolset-7.0/root/usr/bin:${PATH}"
 
