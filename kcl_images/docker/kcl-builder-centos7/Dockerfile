@@ -8,6 +8,12 @@ FROM centos:centos7
 # https://access.redhat.com/articles/2050743
 RUN touch /etc/sysconfig/64bit_strstr_via_64bit_strstr_sse2_unaligned
 
+RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup && \
+    curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo && \
+    sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo && \
+    yum clean all && \
+    yum makecache
+
 # ---------------------------------------------------------------------------------
 # Please note: The following steps are to install the dependency packages 
 # needed to compile CPython for centos7, see the 
@@ -72,6 +78,22 @@ RUN rustup target add wasm32-unknown-unknown
 
 RUN yum -y install centos-release-scl
 RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
+
+RUN echo "[centos-sclo-sclo]" > /etc/yum.repos.d/CentOS-SCLo-scl.repo \
+    && echo "name=CentOS-7 - SCLo sclo" >> /etc/yum.repos.d/CentOS-SCLo-scl.repo \
+    && echo "baseurl=https://mirrors.aliyun.com/centos/7/sclo/x86_64/sclo/" >> /etc/yum.repos.d/CentOS-SCLo-scl.repo \
+    && echo "gpgcheck=0" >> /etc/yum.repos.d/CentOS-SCLo-scl.repo \
+    && echo "enabled=1" >> /etc/yum.repos.d/CentOS-SCLo-scl.repo \
+    && echo "gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-SCLo" >> /etc/yum.repos.d/CentOS-SCLo-scl.repo
+
+# 写入 CentOS-SCLo-scl-rh.repo 文件
+RUN echo "[centos-sclo-rh]" > /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo \
+    && echo "name=CentOS-7 - SCLo rh" >> /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo \
+    && echo "baseurl=https://mirrors.aliyun.com/centos/7/sclo/x86_64/rh/" >> /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo \
+    && echo "gpgcheck=0" >> /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo \
+    && echo "enabled=1" >> /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo \
+    && echo "gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-SCLo" >> /etc/yum.repos.d/CentOS-SCLo-scl-rh.repo
+
 RUN yum -y install llvm-toolset-7.0
 RUN yum -y install llvm-toolset-7.0\*
 RUN scl enable llvm-toolset-7.0 bash
