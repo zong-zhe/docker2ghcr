@@ -8,13 +8,6 @@ FROM centos:centos7
 # https://access.redhat.com/articles/2050743
 RUN touch /etc/sysconfig/64bit_strstr_via_64bit_strstr_sse2_unaligned
 
-# 设置阿里云的 Yum 镜像源
-RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup && \
-    curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo && \
-    sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo && \
-    yum clean all && \
-    yum makecache
-
 # ---------------------------------------------------------------------------------
 # Please note: The following steps are to install the dependency packages 
 # needed to compile CPython for centos7, see the 
@@ -51,7 +44,7 @@ RUN yum install -y wget
 
 # rust
 # https://www.rust-lang.org/tools/install
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y --default-toolchain 1.83.0
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 
@@ -77,20 +70,11 @@ RUN rustup target add wasm32-unknown-unknown
 # 3. Start using software collections:
 #   $ scl enable llvm-toolset-7.0 bash
 
-RUN yum install -y centos-release-scl centos-release-scl-rh
-
-# 安装 llvm-toolset-7.0
+RUN yum -y install centos-release-scl
+RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
 RUN yum -y install llvm-toolset-7.0
 RUN yum -y install llvm-toolset-7.0\*
-
-# 启用 llvm-toolset-7.0
 RUN scl enable llvm-toolset-7.0 bash
-
-# RUN yum -y install centos-release-scl
-# RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
-# RUN yum -y install llvm-toolset-7.0
-# RUN yum -y install llvm-toolset-7.0\*
-# RUN scl enable llvm-toolset-7.0 bash
 
 # Install gcc7
 RUN yum -y install devtoolset-7*
