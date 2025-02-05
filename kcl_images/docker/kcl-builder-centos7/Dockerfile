@@ -78,10 +78,25 @@ RUN rustup target add wasm32-unknown-unknown
 #   $ scl enable llvm-toolset-7.0 bash
 
 RUN yum -y install centos-release-scl
-RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
+
+# 使用阿里云的 SCL 镜像源
+RUN mv /etc/yum.repos.d/CentOS-SCLo-scl.repo /etc/yum.repos.d/CentOS-SCLo-scl.repo.bak \
+  && curl -o /etc/yum.repos.d/CentOS-SCLo-scl.repo http://mirrors.aliyun.com/repo/Centos-7-SCLo-scl.repo \
+  && yum clean all \
+  && yum makecache
+
+# 安装 llvm-toolset-7.0
 RUN yum -y install llvm-toolset-7.0
 RUN yum -y install llvm-toolset-7.0\*
+
+# 启用 llvm-toolset-7.0
 RUN scl enable llvm-toolset-7.0 bash
+
+# RUN yum -y install centos-release-scl
+# RUN yum-config-manager --enable rhel-server-rhscl-7-rpms
+# RUN yum -y install llvm-toolset-7.0
+# RUN yum -y install llvm-toolset-7.0\*
+# RUN scl enable llvm-toolset-7.0 bash
 
 # Install gcc7
 RUN yum -y install devtoolset-7*
