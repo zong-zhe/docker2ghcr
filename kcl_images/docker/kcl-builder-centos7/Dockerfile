@@ -77,13 +77,7 @@ RUN rustup target add wasm32-unknown-unknown
 # 3. Start using software collections:
 #   $ scl enable llvm-toolset-7.0 bash
 
-RUN yum -y install centos-release-scl
-
-# 使用阿里云的 SCL 镜像源
-RUN mv /etc/yum.repos.d/CentOS-SCLo-scl.repo /etc/yum.repos.d/CentOS-SCLo-scl.repo.bak \
-  && curl -o /etc/yum.repos.d/CentOS-SCLo-scl.repo http://mirrors.aliyun.com/repo/Centos-7-SCLo-scl.repo \
-  && yum clean all \
-  && yum makecache
+RUN yum install -y centos-release-scl centos-release-scl-rh
 
 # 安装 llvm-toolset-7.0
 RUN yum -y install llvm-toolset-7.0
